@@ -48,72 +48,32 @@ const Dashboard = () => {
     }
   }, [currentMovie]);
   return (
-    <div className="h-[86vh] flex p-2 pt-1 relative">
-      <div className="h-fit flex flex-col justify-start min-w-[64vw] px-4  ">
-        <div className="">
-          <TextField
-            id="outlined-basic"
-            variant="outlined"
-            className="w-full"
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-            }}
-          />
-          {searchedMovies && searchText.length !== 0 && (
-            <div className="flex flex-col gap-2 max-h-[40vh] overflow-auto z-1 pt-2 text-sm z-100">
-              {searchedMovies.map((movie) => (
-                <div
-                  key={movie.id}
-                  className="flex gap-2 border-b border-b-slate-300 pb-1 hover:cursor-pointer"
-                  onClick={() => {
-                    setCurrentMovie(movie.id);
-                    setSearchText("");
-                  }}
-                >
-                  <img
-                    className="w-10 h-12 rounded-sm"
-                    src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
-                    alt="movie"
-                  />
-                  <div className="flex flex-col relative">
-                    <p>{movie.title}</p>
-                    <p>{movie.release_date}</p>
-                    <p className="flex absolute left-[46vw] min-w-[10vw] gap-2 ">
-                      Rating: {movie.vote_average}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-        <div className="w-full grid grid-cols-3 gap-4  p-3">
-          <div className="col-span-1 ">
+    <div className="md:h-[86vh] flex p-2 pt-1 relative xs:border md:border-none xs:ml-[-10vw] md:ml-0 xs:h-fit">
+      <div className="h-fit flex flex-col justify-start min-w-[64vw] xs:px-1 md:px-4">
+        <div className="w-full grid xs:frid-rows-3  md:grid-cols-3 gap-4  p-3">
+          <div className="xs:flex md:hidden  md:m-0  w-full">
+            <Rightbar />
+          </div>
+          <div className="xs:row-span-1 md:col-span-1 ">
             <Cardbar title="Total Revenue" data={selectedMovie?.revenue} />
           </div>
-          <div className="col-span-1 ">
+          <div className="xs:row-span-1 md:col-span-1 ">
             <Cardbar title="Total Budget" data={selectedMovie?.budget} />
           </div>
-          <div className="col-span-1 ">
+          <div className="xs:row-span-1 md:col-span-1 ">
             <Cardbar title="Total Runtime" data={selectedMovie?.runtime} />
           </div>
         </div>
-        <div className="flex gap-2 p-2">
-          <GaugeBar />
-          <GaugeBar />
+        <div className="flex md:flex-row xs:flex-col xs:justify-center xs:items-center gap-2 p-2 ">
+          <GaugeBar type={"rating"} />
+          <GaugeBar type={"vote"} />
           <ActivePie />
         </div>
-        <div className="py-2">
+        <div className="xs:hidden md:flex py-2">
           <Areabar />
         </div>
       </div>
-      <div className="max-w-[20vw]">
+      <div className="xs:hidden md:flex md:fixed md:right-2 md:max-w-[20vw] xs:w-full">
         <Rightbar />
       </div>
     </div>

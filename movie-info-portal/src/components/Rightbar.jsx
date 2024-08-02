@@ -5,8 +5,16 @@ import {
   nowPlayingMovies,
 } from "../api/tmdbApi";
 import { useDispatch } from "react-redux";
-import { addCurrentMovie } from "../redux/movieReudx";
+import { addCurrentMovie, updateCurrentMovie } from "../redux/movieReudx";
 import { useSelector } from "react-redux";
+import {
+  AddtoFavAPI,
+  addMOvieLinkAPI,
+  getMovieLinkAPI,
+  isFavAPI,
+} from "../api/user";
+import { useAuth0 } from "@auth0/auth0-react";
+
 const movie = {
   name: "Adipursuh",
   // Des
@@ -15,6 +23,37 @@ const Rightbar = () => {
   const currentMovie = useSelector((state) => state.movies.currentMovie);
   const [currentImage, setCurrentImage] = useState(null);
   const [currentMovieCast, setCurrentMovieCast] = useState(null);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const userDetails = useSelector((state) => state.user.currentUser);
+  const [movieLinkState, setMovieLinkState] = useState("");
+  const dispatch = useDispatch();
+  const [movieLink, setMovieLink] = useState(null);
+  const { loginWithRedirect, user, isAuthenticated, isLoading, logout } =
+    useAuth0();
+  const addtoFav = async () => {
+    let res = await AddtoFavAPI({ movieID: currentMovie.id.toString() });
+    console.log("res", res);
+    setIsFavorite(true);
+  };
+  const handleAddMovie = async () => {
+    if (movieLink !== "" && movieLink !== null) {
+      console.log("mivieLink", movieLink);
+      let res = await addMOvieLinkAPI(currentMovie.id, movieLink);
+      console.log("res", res);
+    }
+  };
+  const isFav = async () => {
+    console.log("isFAav");
+    let res = await isFavAPI(currentMovie.id);
+    console.log("res", res.success);
+    setIsFavorite(res.success);
+  };
+  const getMovieLinkApi = async () => {
+    let res = await getMovieLinkAPI(currentMovie.id);
+    console.log("get res", res);
+    setMovieLink((prev) => res.link);
+  };
+
   useEffect(() => {
     const fetchCurrentMovieCast = async () => {
       let res = await fetch(movieCastDetails(currentMovie.id));
@@ -24,24 +63,26 @@ const Rightbar = () => {
       if (data) {
         let castData = data.cast;
         let cast = "";
-        
-        castData?.map((item ,i) => {
+
+        castData?.map((item, i) => {
           console.log("each cast", item);
-          i<=10 ? cast += item.name + ", " : null;
+          i <= 10 ? (cast += item.name + ", ") : null;
         });
         setCurrentMovieCast((prev) => cast);
       }
     };
     if (currentMovie) {
       fetchCurrentMovieCast();
+      isFav();
+      getMovieLinkApi();
     }
   }, [currentMovie]);
 
   return (
     <div className=" flex flex-col gap-2 border p-4 justify-center items-start">
-      <div className="m-auto">
+      <div className="xs:m-0 md:m-auto">
         <img
-          className="w-26 h-36 rounded-xl"
+          className="xs:w-[80vw] xs:h-70 xs:rounded-xl  md:w-26 md:h-36 md:rounded-xl"
           src={`https://image.tmdb.org/t/p/w780${currentMovie.poster_path}`}
           alt="movie"
         />
@@ -79,6 +120,62 @@ const Rightbar = () => {
           &nbsp;
           {currentMovie ? currentMovieCast : ""}
         </span>
+      </div>
+
+      <div className="flex justify-start ">
+        <p className="text-xs font-bold">Favroites : </p>
+        <span className="text-xs ml-2 mt-[-6px] px-2 py-1 text-white rounded-xl ">
+          <button
+            className={`px-2 py-1 rounded-xl ${
+              isFavorite ? "px-4 bg-blue-500" : "bg-yellow-400"
+            }`}
+            disabled={isFavorite}
+            onClick={() => {
+              user ? addtoFav() : alert("Please Login");
+            }}
+          >
+            {isFavorite ? "Favorited" : "Add to Favorites"}
+          </button>
+        </span>
+      </div>
+      <div className="flex justify-start ">
+        <p className="text-xs font-bold">Link : </p>
+        {userDetails?.user?.admin ? (
+          <>
+            <input
+              value={movieLink}
+              onChange={(e) => setMovieLink(e.target.value)}
+              className="mt-[-4px] ml-2 border border-slate-500 rounded-xl text-xs px-2"
+              type="text"
+              placeholder="Enter Link"
+            ></input>
+
+            <button
+              className="ml-1 bg-blue-600 px-2 py-1 mt-[-4px]  text-white rounded-xl text-xs"
+              onClick={() => handleAddMovie()}
+            >
+              {movieLink ? "U" : "A"}
+            </button>
+          </>
+        ) : (
+          <span className="text-xs ml-2 mt-[-6px] px-2 py-1 text-white rounded-xl ">
+            {movieLink ? (
+              <a
+                href={
+                  movieLink
+                  // : "https://www.themoviedb.org/movie/now-playing"
+                }
+                target="_blank"
+              >
+                <button className="px-2 py-1 rounded-xl bg-blue-500">
+                  Watch Now
+                </button>
+              </a>
+            ) : (
+              <p className="text-black">Link will be added soon</p>
+            )}
+          </span>
+        )}
       </div>
     </div>
   );

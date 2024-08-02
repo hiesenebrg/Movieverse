@@ -32,7 +32,7 @@ const userSlice = createSlice({
         state.currentUser.data.user.avatar = action.payload.avatar;
       }
     },
-    logout: (state) => {
+    logoutAction: (state) => {
       state.currentUser = null;
       // state.info = null;
       state.isFetching = false;
@@ -40,6 +40,6 @@ const userSlice = createSlice({
   },
 });
 
-export const { loginStart, loginSuccess, loginFailure, logout, update } =
+export const { loginStart, loginSuccess, loginFailure, logoutAction, update } =
   userSlice.actions;
 export default userSlice.reducer;

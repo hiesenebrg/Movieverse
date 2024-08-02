@@ -14,6 +14,12 @@ const movieSlice = createSlice({
       console.log("action", action.payload);
       state.currentMovie = action.payload;
     },
+
+    updateCurrentMovie: (state, action) => {
+      let currentMovie = action.payload;
+      state.currentMovie = currentMovie
+    },
+
     Success: (state, action) => {
       state.isFetching = false;
     },
@@ -27,5 +33,6 @@ const movieSlice = createSlice({
   },
 });
 
-export const { Start, Success, Failure,addCurrentMovie } = movieSlice.actions;
+export const { Start, Success, Failure, addCurrentMovie, updateCurrentMovie } =
+  movieSlice.actions;
 export default movieSlice.reducer;

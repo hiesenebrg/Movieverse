@@ -82,20 +82,20 @@ export default function ActivePie() {
 
   return (
     <div>
-    <PieChart width={200} height={200} className='text-sm border min-w-[20vw] border-slate-200'>
-      <Pie
-        activeIndex={activeIndex}
-        activeShape={renderActiveShape}
-        data={data}
-        cx={100}
-        cy={100}
-        innerRadius={40}
-        outerRadius={60}
-        fill="#8884d8"
-        dataKey="value"
-        onMouseEnter={onPieEnter}
-      />
-    </PieChart>
+      <PieChart width={300} height={198} className='text-sm border min-w-[20vw]  md:px-0 border-slate-200'>
+        <Pie
+          activeIndex={activeIndex}
+          activeShape={renderActiveShape}
+          data={data}
+          cx={150}
+          cy={100}
+          innerRadius={40}
+          outerRadius={60}
+          fill="#8884d8"
+          dataKey="value"
+          onMouseEnter={onPieEnter}
+        />
+      </PieChart>
     </div>
   );
 }

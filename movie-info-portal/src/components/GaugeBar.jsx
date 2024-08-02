@@ -1,20 +1,23 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
-import { PieChart, Pie, Cell } from 'recharts';
+import React from "react";
+import { useSelector } from "react-redux";
+import { PieChart, Pie, Cell } from "recharts";
 
-const GaugeBar = () => {
+const GaugeBar = ({ type }) => {
   const currentMovie = useSelector((state) => state.movies.currentMovie);
   const RADIAN = Math.PI / 180;
   const data = [
-    { name: 'A', value: 80, color: '#6161d4' },
-    { name: 'B', value: 45, color: '#4646e3' },
-    { name: 'C', value: 25, color: '#080894' },
+    { name: "A", value: 80, color: type === "rating" ? `#6161d4` : `#d46161` },
+    { name: "B", value: 45, color: type === "rating" ? "#4646e3" : `#b92626` },
+    { name: "C", value: 25, color: type === "rating" ? "#050551" : `#890606` },
   ];
   const cx = 150;
   const cy = 200;
   const iR = 50;
   const oR = 100;
-  const value = currentMovie?.vote_average * 12;
+  const value =
+    type === "rating"
+      ? currentMovie?.vote_average * 12
+      : currentMovie?.vote_count;
 
   const needle = (value, data, cx, cy, iR, oR, color) => {
     let total = 0;
@@ -37,13 +40,17 @@ const GaugeBar = () => {
 
     return [
       <circle cx={x0} cy={y0} r={r} fill={color} stroke="none" />,
-      <path d={`M${xba} ${yba}L${xbb} ${ybb} L${xp} ${yp} L${xba} ${yba}`} stroke="#none" fill={color} />,
+      <path
+        d={`M${xba} ${yba}L${xbb} ${ybb} L${xp} ${yp} L${xba} ${yba}`}
+        stroke="#none"
+        fill={color}
+      />,
     ];
   };
 
   return (
-    <div className='p-4 border border-1-slate-200 w-fit h-fit'>
-      <PieChart width={260} height={200} className='mt-[-80px] ml-[-60px]'>
+    <div className="xs:px-12 xs:py-4 md:p-4 border border-1-slate-200 w-fit h-fit">
+      <PieChart width={260} height={200} className="mt-[-80px] ml-[-60px]">
         <Pie
           dataKey="value"
           startAngle={180}
@@ -60,10 +67,12 @@ const GaugeBar = () => {
             <Cell key={`cell-${index}`} fill={entry.color} />
           ))}
         </Pie>
-        {needle(value, data, cx, cy, iR, oR, '#0d0a01')}
+        {needle(value, data, cx, cy, iR, oR, "#0d0a01")}
       </PieChart>
-      <div className='w-full flex justify-center mt-4'>
-        Rating
+      <div className="w-full flex justify-center mt-4">
+        {type === "rating"
+          ? `Rating - ${currentMovie.vote_average}`
+          : `Vote Count - ${currentMovie.popularity}`}
       </div>
     </div>
   );
