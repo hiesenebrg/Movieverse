@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { movieDetails, nowPlayingMovies, searchMovies, upcomingMovies } from "../api/tmdbApi";
+import {processRequest,  movieDetails, nowPlayingMovies, searchMovies, upcomingMovies } from "../api/tmdbApi";
 import Card from "../components/Card";
 import { useDispatch } from "react-redux";
 import { addCurrentMovie } from "../redux/movieReudx";
@@ -25,15 +25,18 @@ const Home = () => {
 
   const fetchUpcomingMovies = async () => {
     setIsLoading(true);
+    let res = await processRequest(page)
+  console.log('ressss', res);
     console.log("fetch");
-    let res = await fetch(nowPlayingMovies(page));
-    let data = await res.json();
+    let data= res.results;
+    // let res = await fetch(nowPlayingMovies(page));
+    // let data = await res.json();
     console.log("data23", data);
-    setMovieWithDetails((prev) => data);
-    let movieIds = data.results.map((item) => item.id);
+    setMovieWithDetails((prev) =>res);
+    let movieIds = res.map((item) => item.split("/")[2]);
     console.log("movieIds", movieIds);
     setAllMovies((prev) => movieIds);
-    setTotalCount((prev) => data.total_results);
+    setTotalCount((prev) => 100);
     setIsLoading(false);
   };
 
@@ -42,7 +45,7 @@ const Home = () => {
   }, [page]);
 
   const handleCurrentMovie = async () => {
-    let res = await fetch(movieDetails(currentMovie));
+    let res = await fetch(nowPlayingMovies(currentMovie));
     let data = await res.json();
     console.log("current movie data", data);
     dispatch(addCurrentMovie(data));
@@ -61,7 +64,7 @@ const Home = () => {
         const res = await fetch(searchMovies(searchText));
         const data = await res.json();
         console.log("data", data);
-        setSearchedMovies((prev) => data.results);
+        setSearchedMovies((prev) => data.Search);
       } catch (error) {
         console.log("error", error);
       }
@@ -96,23 +99,25 @@ const Home = () => {
                 <div className="flex flex-col gap-2 max-h-[40vh] overflow-auto z-1 pt-2 text-sm z-100 bg-white">
                   {searchedMovies.map((movie) => (
                     <div
-                      key={movie.id}
+                      key={movie.imdbID}
                       className="flex gap-2 border-b border-b-slate-300 pb-1 hover:cursor-pointer"
                       onClick={() => {
-                        setCurrentMovie(movie.id);
+                        setCurrentMovie(movie.imdbID);
                         setSearchText("");
+                       
                       }}
                     >
                       <img
                         className="w-10 h-12 rounded-sm"
-                        src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
+                        // src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
+                        src={movie.Poster}
                         alt="movie"
                       />
                       <div className="flex flex-col relative">
-                        <p>{movie.title}</p>
-                        <p>{movie.release_date}</p>
+                        <p>{movie.Title}</p>
+                        <p>{movie.Year}</p>
                         <p className="flex absolute left-[46vw] min-w-[10vw] gap-2 ">
-                          Rating: {movie.vote_average}
+                          {/* Rating: {movie.vote_average} */}
                         </p>
                       </div>
                     </div>

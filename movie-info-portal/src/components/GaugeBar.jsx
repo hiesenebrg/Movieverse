@@ -4,6 +4,8 @@ import { PieChart, Pie, Cell } from "recharts";
 
 const GaugeBar = ({ type }) => {
   const currentMovie = useSelector((state) => state.movies.currentMovie);
+  console.log("ssss" ,typeof currentMovie?.Ratings[0]?.Value.split("/")[0]);
+
   const RADIAN = Math.PI / 180;
   const data = [
     { name: "A", value: 80, color: type === "rating" ? `#6161d4` : `#d46161` },
@@ -15,9 +17,9 @@ const GaugeBar = ({ type }) => {
   const iR = 50;
   const oR = 100;
   const value =
-    type === "rating"
-      ? currentMovie?.vote_average * 12
-      : currentMovie?.vote_count;
+    type === "Internet Movie Database"
+      ? parseInt(currentMovie?.Ratings[0] ? currentMovie?.Ratings[0]?.Value.split("/")[0]:"4") * 12
+      : parseInt(currentMovie?.Ratings[1] ? currentMovie?.Ratings[1]?.Value.split("%")[0]:"40") * 1.5;
 
   const needle = (value, data, cx, cy, iR, oR, color) => {
     let total = 0;
@@ -70,9 +72,9 @@ const GaugeBar = ({ type }) => {
         {needle(value, data, cx, cy, iR, oR, "#0d0a01")}
       </PieChart>
       <div className="w-full flex justify-center mt-4">
-        {type === "rating"
-          ? `Rating - ${currentMovie.vote_average}`
-          : `Vote Count - ${currentMovie.popularity}`}
+        {type === "Internet Movie Database"
+          ? `IMDB - ${currentMovie?.Ratings[0] ? currentMovie?.Ratings[0]?.Value.split("/")[0] : 4}`
+          : `Rotten Tomatoes - ${currentMovie?.Ratings[1] ? currentMovie?.Ratings[1]?.Value.split("/")[0] : '40%'}`}
       </div>
     </div>
   );

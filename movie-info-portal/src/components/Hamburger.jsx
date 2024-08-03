@@ -5,34 +5,37 @@ import MenuItem from "@mui/material/MenuItem";
 import MenuIcon from "@mui/icons-material/Menu";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useSelector } from "react-redux";
 
-const MenuList = [
-  {
-    id: 1,
-    name: "home",
-    link: "/",
-
-    displayName: "Home",
-    subMenu: [],
-  },
-  {
-    id: 2,
-    name: "dashboard",
-    link: "/dashboard",
-
-    displayName: "Dashboard",
-    subMenu: [],
-  },
-  {
-    id: 3,
-    name: "favorite",
-    link: "/favorites",
-
-    displayName: "Favorites",
-    subMenu: [],
-  },
-];
 const Hamburger = () => {
+  const user = useSelector((state) => state.user.currentUser);
+  const MenuList = [
+    {
+      id: 1,
+      name: "home",
+      link: "/",
+      abled: true,
+      displayName: "Home",
+      subMenu: [],
+    },
+    {
+      id: 2,
+      name: "dashboard",
+      link: "/dashboard",
+      abled: true,
+      displayName: "Dashboard",
+      subMenu: [],
+    },
+    {
+      id: 3,
+      name: "favorite",
+      link: "/favorites",
+      abled: user ? true : false,
+      displayName: "Favorites",
+      subMenu: [],
+    },
+  ];
+  console.log("currentUSer", user);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const [selectedMenu, setSelectedMenu] = useState(null);
@@ -55,6 +58,7 @@ const Hamburger = () => {
     navigate(menu.link);
     return menu;
   };
+
   React.useEffect(() => {
     highlightSelectedMenu(location.pathname);
   }, [location.pathname]);
@@ -86,22 +90,25 @@ const Hamburger = () => {
         }}
       >
         {MenuList &&
-          MenuList.map((menu) => (
-            <MenuItem
-              key={menu.id}
-              className={
-                selectedMenu?.name === menu.name
-                  ? "w-full flex gap-2 bg-slate-200 rounded-md  px-3 py-1 text-blue-800"
-                  : "fw-full flex gap-2 px-3 py-1"
-              }
-              onClick={() => {
-                handleMenuItemClick(menu);
-                handleClose();
-              }}
-            >
-              {menu.displayName}
-            </MenuItem>
-          ))}
+          MenuList.map((menu) => {
+            return (
+              <MenuItem
+              disabled={!menu.abled}
+                key={menu.id}
+                className={
+                  selectedMenu?.name === menu.name
+                    ? "w-full flex gap-2 bg-slate-200 rounded-md  px-3 py-1 text-blue-800"
+                    : "fw-full flex gap-2 px-3 py-1"
+                }
+                onClick={() => {
+                  handleMenuItemClick(menu);
+                  handleClose();
+                }}
+              >
+                {menu.displayName}
+              </MenuItem>
+            );
+          })}
       </Menu>
     </div>
   );

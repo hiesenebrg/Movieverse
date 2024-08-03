@@ -31,7 +31,7 @@ const Rightbar = () => {
   const { loginWithRedirect, user, isAuthenticated, isLoading, logout } =
     useAuth0();
   const addtoFav = async () => {
-    let res = await AddtoFavAPI({ movieID: currentMovie.id.toString() });
+    let res = await AddtoFavAPI({ movieID: currentMovie.imdbID.toString() });
     console.log("res", res);
     setIsFavorite(true);
   };
@@ -83,42 +83,51 @@ const Rightbar = () => {
       <div className="xs:m-0 md:m-auto">
         <img
           className="xs:w-[80vw] xs:h-70 xs:rounded-xl  md:w-26 md:h-36 md:rounded-xl"
-          src={`https://image.tmdb.org/t/p/w780${currentMovie.poster_path}`}
+          src={currentMovie.Poster}
           alt="movie"
         />
       </div>
       <div className="text-center font-bold m-auto">
-        {currentMovie ? currentMovie.title : "Loading..."}
+        {currentMovie ? currentMovie.Title : "Loading..."}
       </div>
       <p className="text-[12px] overflow-hidden overflow-ellipsis h-[13.4vh]">
-        {currentMovie ? currentMovie.overview : "Loading..."}...
+        {currentMovie ? currentMovie.Plot : "Loading..."}...
       </p>
       <div className="flex justify-start ">
         <p className="text-xs font-bold"> Release Date : </p>
         <span className="text-xs">
-          &nbsp;{currentMovie ? currentMovie.release_date : "-"}
+          &nbsp;{currentMovie ? currentMovie.Released : "-"}
         </span>
       </div>
       <div className="flex justify-start ">
         <p className="text-xs font-bold"> Original Laungages : </p>
         <span className="text-xs">
           &nbsp;
-          {currentMovie
-            ? currentMovie.original_language === "en"
-              ? "English"
-              : currentMovie.original_language === "hi"
-              ? "Hindi"
-              : currentMovie.original_language === "ja"
-              ? "Japanese"
-              : "Others"
-            : "-"}
+          {currentMovie.Language
+            }
+        </span>
+      </div>
+      <div className="flex justify-start ">
+        <p className="text-xs font-bold"> Generes : </p>
+        <span className="text-xs">
+          &nbsp;
+          {currentMovie.Genre
+            }
+        </span>
+      </div>
+      <div className="flex justify-start ">
+        <p className="text-xs font-bold"> Country : </p>
+        <span className="text-xs">
+          &nbsp;
+          {currentMovie.Country
+            }
         </span>
       </div>
       <div className="flex justify-start ">
         <p className="text-xs font-bold"> Casts: </p>
         <span className="text-xs">
           &nbsp;
-          {currentMovie ? currentMovieCast : ""}
+          {currentMovie ? currentMovie.Actors : ""}
         </span>
       </div>
 

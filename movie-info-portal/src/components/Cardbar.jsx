@@ -39,7 +39,7 @@ const Cardbar = ({ title, data }) => {
         {data
           ? title === "Total Runtime"
             ? hourmin(data)
-            : `$${formatNumber(data)}`
+            : `${data}`
           : "$0"}
       </div>
     </div>

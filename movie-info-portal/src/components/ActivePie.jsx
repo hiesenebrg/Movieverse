@@ -8,10 +8,10 @@ export default function ActivePie() {
   const [activeIndex, setActiveIndex] = useState(0);
   const currentMovie = useSelector((state) => state.movies.currentMovie);
   const data = [
-    { name: "Release", value: 400 ,values:currentMovie.release_date},
-    { name: "Popularity", value: 300 ,values:currentMovie.popularity },
-    { name: "Country", value: 300 ,values:currentMovie.origin_country[0]==='IN'? 'India' : 'USA' },
-    { name: "Vote Count", value: 200 ,values:currentMovie.vote_count },
+    { name: "Release", value: 400 ,values:currentMovie.Released},
+    { name: "Popularity", value: 300 ,values:currentMovie.imdbVotes },
+    { name: "Country", value: 300 ,values:currentMovie.Country.split(",")[0] },
+    { name: "Vote Count", value: 200 ,values:currentMovie.imdbVotes },
   ];
   
   const renderActiveShape = (props) => {

@@ -20,7 +20,7 @@ const Dashboard = () => {
   const dispatch = useDispatch();
 
   const handleCurrentMovie = async () => {
-    let res = await fetch(movieDetails(currentMovie));
+    let res = await fetch(nowPlayingMovies(currentMovie));
     let data = await res.json();
     console.log("current movie data", data);
     dispatch(addCurrentMovie(data));
@@ -55,19 +55,19 @@ const Dashboard = () => {
             <Rightbar />
           </div>
           <div className="xs:row-span-1 md:col-span-1 ">
-            <Cardbar title="Total Revenue" data={selectedMovie?.revenue} />
+            <Cardbar title="Total Revenue" data={selectedMovie?.BoxOffice} />
           </div>
           <div className="xs:row-span-1 md:col-span-1 ">
-            <Cardbar title="Total Budget" data={selectedMovie?.budget} />
+            <Cardbar title="Total Budget" data={selectedMovie?.Production} />
           </div>
           <div className="xs:row-span-1 md:col-span-1 ">
-            <Cardbar title="Total Runtime" data={selectedMovie?.runtime} />
+            <Cardbar title="Total Runtime" data={parseInt(selectedMovie?.Runtime)} />
           </div>
         </div>
         <div className="flex md:flex-row xs:flex-col xs:justify-center xs:items-center gap-2 p-2 ">
-          <GaugeBar type={"rating"} />
-          <GaugeBar type={"vote"} />
-          <ActivePie />
+       <GaugeBar type={"Internet Movie Database"} />
+           <GaugeBar type={"Rotten Tomato"} />
+          <ActivePie />  
         </div>
         <div className="xs:hidden md:flex py-2">
           <Areabar />
