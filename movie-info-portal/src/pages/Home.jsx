@@ -1,11 +1,18 @@
 import React, { useEffect, useState } from "react";
-import {processRequest,  movieDetails, nowPlayingMovies, searchMovies, upcomingMovies } from "../api/tmdbApi";
+import {
+  processRequest,
+  movieDetails,
+  nowPlayingMovies,
+  searchMovies,
+  upcomingMovies,
+} from "../api/tmdbApi";
 import Card from "../components/Card";
 import { useDispatch } from "react-redux";
 import { addCurrentMovie } from "../redux/movieReudx";
 import { InputAdornment, Pagination, TextField } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import { useNavigate } from "react-router-dom";
+import { getPopularMovies } from "../api/user";
 
 const Home = () => {
   const [allMovies, setAllMovies] = useState(null);
@@ -25,17 +32,19 @@ const Home = () => {
 
   const fetchUpcomingMovies = async () => {
     setIsLoading(true);
-    let res = await processRequest(page)
-  console.log('ressss', res);
-    console.log("fetch");
-    let data= res.results;
-    // let res = await fetch(nowPlayingMovies(page));
-    // let data = await res.json();
-    console.log("data23", data);
-    setMovieWithDetails((prev) =>res);
-    let movieIds = res.map((item) => item.split("/")[2]);
-    console.log("movieIds", movieIds);
-    setAllMovies((prev) => movieIds);
+    let resp = await getPopularMovies(page);
+    if (resp) {
+      let res = resp.popularMovies;
+      console.log("ressss", resp);
+      console.log("fetch");
+      // let res = await fetch(nowPlayingMovies(page));
+      // let data = await res.json();
+      setMovieWithDetails((prev) => res);
+      let movieIds = res.map((item) => item.split("/")[2]);
+      console.log("movieIds", movieIds);
+      setAllMovies((prev) => movieIds);
+    }
+
     setTotalCount((prev) => 100);
     setIsLoading(false);
   };
@@ -104,7 +113,6 @@ const Home = () => {
                       onClick={() => {
                         setCurrentMovie(movie.imdbID);
                         setSearchText("");
-                       
                       }}
                     >
                       <img
@@ -148,7 +156,9 @@ const Home = () => {
           </div>
         </>
       ) : (
-        <div className="flex justify-center items-center h-[90vh]">Loading...</div>
+        <div className="flex justify-center items-center h-[90vh]">
+          Loading...
+        </div>
       )}
     </div>
   );

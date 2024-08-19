@@ -71,3 +71,15 @@ export const getMovieLinkAPI = async (movieId) => {
   }
 };
 
+export const getPopularMovies = async ( pageNumber) => {
+  try {
+    const token = localStorage.getItem("token");
+
+    let res = await publicRequest.get(`movie/getAllMovies/${pageNumber}`);
+    return res.data;
+  } catch (error) {
+    console.log("There is an error while login", error);
+    return error;
+  }
+};
+

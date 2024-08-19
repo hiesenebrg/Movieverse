@@ -1,9 +1,54 @@
 const { PrismaClient } = require("@prisma/client");
 const generateText = require("../config/open-ai");
 const webdriver = require("selenium-webdriver");
+const redisClient = require("../config/redis");
 const By = webdriver.By;
+const axios = require("axios");
 const prisma = new PrismaClient({ log: ["query"] });
+module.exports.getAllMovies = async (req, res) => {
+  try {
+    let pageNumber = req.params.pageNumber;
+    let currentMovies = await redisClient.get(`CURRENT_MOVIES:${pageNumber}`);
+    if (currentMovies) {
+      console.log("not calling imdb api");
+      return res.status(200).json({
+        success: true,
+        message: "Dashboard Movies",
+        popularMovies: JSON.parse(currentMovies),
+      });
+    }
+    console.log("calling imdb api");
+    let apiResponse = await axios.get(
+      `https://imdb8.p.rapidapi.com/title/get-most-popular-movies?homeCountry=US&purchaseCountry=US&currentCountry=US&page=${pageNumber}`,
+      {
+        headers: {
+          "x-rapidapi-key":
+            "d54328eb1amsh00ad5f27d3b7418p11103djsnd4e3d86241c0",
+          "x-rapidapi-host": "imdb8.p.rapidapi.com",
+        },
+      }
+    );
+    if (apiResponse.data) {
+      await redisClient.setex(
+        `CURRENT_MOVIES:${pageNumber}`,
+        14400,
+        JSON.stringify(apiResponse.data)
+      );
 
+      return res.status(200).json({
+        success: true,
+        message: "Dashboard Movies",
+        popularMovies: res.data,
+      });
+    }
+  } catch (error) {
+    console.log("error", error);
+    return res.status(500).json({
+      success: false,
+      message: "Interval server error",
+    });
+  }
+};
 module.exports.getAllFavorite = async (req, res) => {
   try {
     const favorites = await prisma.movieToVideo.findMany({
@@ -36,6 +81,7 @@ module.exports.getAllFavorite = async (req, res) => {
 module.exports.addMovieLink = async (req, res) => {
   try {
     const { movieId, link } = req.body;
+    console.log("movieId", link);
     const movie = await prisma.movie.findUnique({
       where: {
         movieID: movieId.toString(),

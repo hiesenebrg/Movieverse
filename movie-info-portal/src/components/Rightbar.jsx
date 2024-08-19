@@ -13,6 +13,7 @@ import {
   getMovieLinkAPI,
   isFavAPI,
 } from "../api/user";
+import { BeatLoader } from "react-spinners";
 import { useAuth0 } from "@auth0/auth0-react";
 
 const movie = {
@@ -30,33 +31,47 @@ const Rightbar = () => {
   const [movieLink, setMovieLink] = useState(null);
   const { loginWithRedirect, user, isAuthenticated, isLoading, logout } =
     useAuth0();
+  const [isLoadings, setIsLoading] = useState(false);
+  const [isLinkAddLoading, setisLinkAddLoading] = useState(false);
+
   const addtoFav = async () => {
+    setIsLoading((prev) => true);
     let res = await AddtoFavAPI({ movieID: currentMovie.imdbID.toString() });
-    console.log("res", res);
+    console.log("fav res", res);
     setIsFavorite(true);
+    setIsLoading((prev) => false);
   };
   const handleAddMovie = async () => {
+    setisLinkAddLoading(true);
     if (movieLink !== "" && movieLink !== null) {
       console.log("mivieLink", movieLink);
-      let res = await addMOvieLinkAPI(currentMovie.id, movieLink);
+      let res = await addMOvieLinkAPI(currentMovie.imdbID, movieLink);
       console.log("res", res);
+      if(res && res.success){
+alert("movie link added/updated")
+      }else{
+alert("something went wrong!")
+      }
     }
+    setisLinkAddLoading(false);
   };
   const isFav = async () => {
     console.log("isFAav");
-    let res = await isFavAPI(currentMovie.id);
+    let res = await isFavAPI(currentMovie.imdbID);
     console.log("res", res.success);
     setIsFavorite(res.success);
   };
   const getMovieLinkApi = async () => {
-    let res = await getMovieLinkAPI(currentMovie.id);
+    setisLinkAddLoading(true);
+    let res = await getMovieLinkAPI(currentMovie.imdbID);
     console.log("get res", res);
     setMovieLink((prev) => res.link);
+    setisLinkAddLoading(false);
   };
 
   useEffect(() => {
     const fetchCurrentMovieCast = async () => {
-      let res = await fetch(movieCastDetails(currentMovie.id));
+      let res = await fetch(movieCastDetails(currentMovie.imdbID));
 
       let data = await res.json();
       console.log("cast", data);
@@ -103,24 +118,21 @@ const Rightbar = () => {
         <p className="text-xs font-bold"> Original Laungages : </p>
         <span className="text-xs">
           &nbsp;
-          {currentMovie.Language
-            }
+          {currentMovie.Language}
         </span>
       </div>
       <div className="flex justify-start ">
         <p className="text-xs font-bold"> Generes : </p>
         <span className="text-xs">
           &nbsp;
-          {currentMovie.Genre
-            }
+          {currentMovie.Genre}
         </span>
       </div>
       <div className="flex justify-start ">
         <p className="text-xs font-bold"> Country : </p>
         <span className="text-xs">
           &nbsp;
-          {currentMovie.Country
-            }
+          {currentMovie.Country}
         </span>
       </div>
       <div className="flex justify-start ">
@@ -134,56 +146,66 @@ const Rightbar = () => {
       <div className="flex justify-start ">
         <p className="text-xs font-bold">Favroites : </p>
         <span className="text-xs ml-2 mt-[-6px] px-2 py-1 text-white rounded-xl ">
-          <button
-            className={`px-2 py-1 rounded-xl ${
-              isFavorite ? "px-4 bg-blue-500" : "bg-yellow-400"
-            }`}
-            disabled={isFavorite}
-            onClick={() => {
-              user ? addtoFav() : alert("Please Login");
-            }}
-          >
-            {isFavorite ? "Favorited" : "Add to Favorites"}
-          </button>
+          {!isLoadings ? (
+            <button
+              className={`px-2 py-1 rounded-xl ${
+                isFavorite ? "px-4 bg-blue-500" : "bg-yellow-400"
+              }`}
+              disabled={isFavorite}
+              onClick={() => {
+                user ? addtoFav() : alert("Please Login");
+              }}
+            >
+              {isFavorite ? "Favorited" : "Add to Favorites"}
+            </button>
+          ) : (
+            <BeatLoader />
+          )}
         </span>
       </div>
       <div className="flex justify-start ">
         <p className="text-xs font-bold">Link : </p>
-        {userDetails?.user?.admin ? (
+        {!isLinkAddLoading ? (
           <>
-            <input
-              value={movieLink}
-              onChange={(e) => setMovieLink(e.target.value)}
-              className="mt-[-4px] ml-2 border border-slate-500 rounded-xl text-xs px-2"
-              type="text"
-              placeholder="Enter Link"
-            ></input>
+            {userDetails?.user?.admin ? (
+              <>
+                <input
+                  value={movieLink}
+                  onChange={(e) => setMovieLink(e.target.value)}
+                  className="mt-[-4px] ml-2 border border-slate-500 rounded-xl text-xs px-2"
+                  type="text"
+                  placeholder="Enter Link"
+                ></input>
 
-            <button
-              className="ml-1 bg-blue-600 px-2 py-1 mt-[-4px]  text-white rounded-xl text-xs"
-              onClick={() => handleAddMovie()}
-            >
-              {movieLink ? "U" : "A"}
-            </button>
+                <button
+                  className="ml-1 bg-blue-600 px-2 py-1 mt-[-4px]  text-white rounded-xl text-xs"
+                  onClick={() => handleAddMovie()}
+                >
+                  {movieLink ? "U" : "A"}
+                </button>
+              </>
+            ) : (
+              <span className="text-xs ml-2 mt-[-6px] px-2 py-1 text-white rounded-xl ">
+                {movieLink ? (
+                  <a
+                    href={
+                      movieLink
+                      // : "https://www.themoviedb.org/movie/now-playing"
+                    }
+                    target="_blank"
+                  >
+                    <button className="px-2 py-1 rounded-xl bg-blue-500">
+                      Watch Now
+                    </button>
+                  </a>
+                ) : (
+                  <p className="text-black">Link will be added soon</p>
+                )}
+              </span>
+            )}
           </>
         ) : (
-          <span className="text-xs ml-2 mt-[-6px] px-2 py-1 text-white rounded-xl ">
-            {movieLink ? (
-              <a
-                href={
-                  movieLink
-                  // : "https://www.themoviedb.org/movie/now-playing"
-                }
-                target="_blank"
-              >
-                <button className="px-2 py-1 rounded-xl bg-blue-500">
-                  Watch Now
-                </button>
-              </a>
-            ) : (
-              <p className="text-black">Link will be added soon</p>
-            )}
-          </span>
+          <BeatLoader />
         )}
       </div>
     </div>

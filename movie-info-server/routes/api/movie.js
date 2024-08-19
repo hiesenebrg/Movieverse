@@ -3,6 +3,7 @@ const router = express.Router();
 const passport = require("passport");
 const cardController = require("../../controllers/movie");
 
+router.get("/getAllMovies/:pageNumber", cardController.getAllMovies);
 router.get(
   "/getAllFavs",
   passport.authenticate("jwt", { session: false }),
