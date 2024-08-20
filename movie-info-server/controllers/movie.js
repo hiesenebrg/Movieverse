@@ -38,7 +38,7 @@ module.exports.getAllMovies = async (req, res) => {
       return res.status(200).json({
         success: true,
         message: "Dashboard Movies",
-        popularMovies: res.data,
+        popularMovies: apiResponse.data,
       });
     }
   } catch (error) {
