@@ -31,9 +31,21 @@ model User {
 model Movie {
   id        String         @id @default(uuid()) @map("_id")
   movieID   String         @unique
-  movieLink String?
+  type      String         @default("movie") // "movie" or "series"
+  movieLink String?        // For movies
+  seasons   Season[]       // For series
   favorites MovieToVideo[]
   timestamp DateTime       @default(now())
+}
+
+model Season {
+  id      String @id @default(uuid()) @map("_id")
+  number  Int
+  link    String
+  movieId String
+  movie   Movie  @relation(fields: [movieId], references: [id])
+
+  @@unique([movieId, number])
 }
 
 model MovieToVideo {

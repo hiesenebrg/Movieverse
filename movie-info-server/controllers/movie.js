@@ -272,3 +272,136 @@ module.exports.webScrapping = async (req, res) => {
     console.log("erroe", error);
   }
 };
+
+module.exports.addLink = async (req, res) => {
+  try {
+    const { movieId, type, link, seasonNumber } = req.body;
+
+    const movie = await prisma.movie.findUnique({
+      where: {
+        movieID: movieId.toString(),
+      },
+    });
+
+    if (!movie) {
+      return res.status(400).json({
+        success: false,
+        message: "Movie/Series not found",
+      });
+    }
+
+    let updatedMovie;
+
+    if (type === "movie") {
+      updatedMovie = await prisma.movie.update({
+        where: {
+          id: movie.id,
+        },
+        data: {
+          movieLink: link,
+          type: "movie",
+        },
+      });
+    } else if (type === "series") {
+      updatedMovie = await prisma.movie.update({
+        where: {
+          id: movie.id,
+        },
+        data: {
+          type: "series",
+          seasons: {
+            upsert: {
+              where: {
+                movieId_number: {
+                  movieId: movie.id,
+                  number: seasonNumber,
+                },
+              },
+              create: {
+                number: seasonNumber,
+                link: link,
+              },
+              update: {
+                link: link,
+              },
+            },
+          },
+        },
+        include: {
+          seasons: true,
+        },
+      });
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid type. Must be 'movie' or 'series'",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: `${type === 'movie' ? 'Movie' : 'Series'} link added/updated`,
+      data: updatedMovie,
+    });
+  } catch (error) {
+    console.log("error", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+module.exports.getLink = async (req, res) => {
+  try {
+    const { movieId } = req.params;
+    console.log("movieId", movieId);
+    const movie = await prisma.movie.findUnique({
+      where: {
+        movieID: movieId.toString(),
+      },
+      include: {
+        seasons: true,
+      },
+    });
+    console.log("movie", movie);
+    if (!movie) {
+      return res.status(400).json({
+        success: false,
+        message: "Movie/Series not found",
+      });
+    }
+
+    if (movie.type === "movie") {
+      return res.status(200).json({
+        success: true,
+        message: "Movie link",
+        link: movie.movieLink,
+      });
+    } else if (movie.type === "series") {
+      if (movie.seasons.length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: "No seasons found for this series",
+        });
+      }
+
+      const seasonLinks = movie.seasons.map(season => ({
+        seasonNumber: season.number,
+        link: season.link,
+      }));
+
+      return res.status(200).json({
+        success: true,
+        message: "Series links",
+        seasons: seasonLinks,
+      });
+    }
+  } catch (error) {
+    console.log("error", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};

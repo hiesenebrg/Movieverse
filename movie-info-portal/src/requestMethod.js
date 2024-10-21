@@ -10,7 +10,7 @@ const BASE_URL = "http://localhost:8000/api";
 // const currentUser = user && JSON.parse(user).currentUser;
 // console.log("toke_currentUser ", currentUser);
 // const TOKEN = currentUser?.token;
-const TOKEN = 'adbc'
+const TOKEN = "adbc";
 console.log("toke_Token ", TOKEN);
 export const publicRequest = axios.create({
   baseURL: BASE_URL,
